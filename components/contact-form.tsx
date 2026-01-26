@@ -25,9 +25,9 @@ const ContactForm = () => {
                     </div>
                     <div className="md:col-span-2">
                         <textarea name="message" rows={5} className="bg-transparent p-3 border border-gray-200 rounded-sm w-full 
-                        font-light" placeholder="Your Message*" ></textarea>
+                        font-light" placeholder="Your Message*"></textarea>
                         <div aria-live="polite" aria-atomic="true">
-                            <p className="text-sm text-red-600 mt-2">Message</p>
+                            <p className="text-sm text-red-600 mt-2 mb-2">Message</p>
                         </div>
                     </div>
                 </div>
