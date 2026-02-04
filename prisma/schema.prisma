@@ -20,7 +20,7 @@ model Clothes {
   description   String @db.Text
   image         String 
   price         Int
-  capacity      Int @default(1)
+  quantity      Int @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   ClothesAmenities ClothesAmenities[]
