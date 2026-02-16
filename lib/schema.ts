@@ -1,10 +1,10 @@
-import { string, z, array } from "zod";
+import { string, z, array, coerce } from "zod";
 
 export const ClothesSchema = z.object({
     name: z.string().min(1, { message: "Name must be at least 6 characters" }),
     description: z.string().min(50, { message: "Description must be at least 50 characters" }),
     quantity: z.number().gt(0, { message: "Please input the quantity" }),
-    price: z.number().gt(0, { message: "Please input the price" }),
+    price: z.coerce.number().gt(0, { message: "Please input the price" }),
     amenities: array(z.string()).nonempty({ message: "Please check the content" }),
 })
 

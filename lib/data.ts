@@ -16,8 +16,20 @@ export const getAmenities = async () => {
 
 export const getClothes = async () => {
     try {
-        const clothes = await prisma.amenities.findMany({
+        const clothes = await prisma.clothes.findMany({
             orderBy: { createdAt: "desc" },
+        });
+        return clothes;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const getClothesById = async (clothesId: string) => {
+    try {
+        const clothes = await prisma.clothes.findUnique({
+            where: { id: clothesId },
+            include: { ClothesAmenities: { select: { amenitiesId: true } } },
         });
         return clothes;
     } catch (error) {
