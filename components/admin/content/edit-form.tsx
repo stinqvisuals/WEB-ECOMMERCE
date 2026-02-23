@@ -7,6 +7,7 @@ import Image from "next/image";
 import { type PutBlobResult } from "@vercel/blob";
 import { Amenities } from "@prisma/client";
 import { useActionState } from "react";
+import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import { ClothesProps } from "@/types/clothes";
 
@@ -17,6 +18,7 @@ export default function EditForm({
     amenities: Amenities[];
     clothes: ClothesProps;
 }) {
+    const router = useRouter();
     const inputFileRef = useRef<HTMLInputElement>(null);
     const [imageUrl, setImageUrl] = useState(clothes.image);
     const [errorMessage, setErrorMessage] = useState("");
@@ -144,7 +146,7 @@ export default function EditForm({
                                 <button
                                     type="button"
                                     onClick={() => deleteImage(imageUrl)}
-                                    className="absolute right-1 top-1 size-6 flex items-center justify-center rounded-sm hover:bg-red-600"
+                                    className="absolute right-1 top-1 text-red-500 size-6 flex items-center justify-center rounded-sm hover:bg-red-500/10 transition disabled:opacity-50"
                                 >
                                     <IoTrashOutline className="size-4 text-white" />
                                 </button>
@@ -198,12 +200,17 @@ export default function EditForm({
                     ) : null}
                     <button
                         type="submit"
-                        className={clsx("w-full bg-red-600 hover:bg-red-700 text-white py-3 font-semibold rounded-sm", {
+                        className={clsx("w-full bg-red-600 hover:bg-red-700 transition text-white py-3 font-semibold rounded-sm", {
                             "opacity-50 cursor-progress": isPending,
                         })}
                         disabled={isPending}
                     >
                         {isPending ? "Updating..." : "Update"}
+                    </button>
+
+                    <button type="button" onClick={() => router.back()} className="w-full mt-3 bg-gray-300 text-black py-3 font-semibold rounded-sm
+                    hover:bg-gray-400 transition">
+                        Cancel
                     </button>
                 </div>
             </div>

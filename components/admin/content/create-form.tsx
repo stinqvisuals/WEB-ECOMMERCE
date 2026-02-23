@@ -130,7 +130,7 @@ export default function CreateForm({ amenities }: { amenities: Amenities[] }) {
                                 <button
                                     type="button"
                                     onClick={() => deleteImage(imageUrl)}
-                                    className="absolute right-1 top-1 size-6 flex items-center justify-center rounded-sm hover:bg-red-600"
+                                    className="absolute right-1 top-1 text-red-500 size-6 flex items-center justify-center rounded-sm hover:bg-red-500/10 transition disabled:opacity-50"
                                 >
                                     <IoTrashOutline className="size-4 text-white" />
                                 </button>
@@ -182,7 +182,7 @@ export default function CreateForm({ amenities }: { amenities: Amenities[] }) {
                     ) : null}
                     <button
                         type="submit"
-                        className={clsx("w-full bg-red-600 hover:bg-red-700 text-white py-3 font-semibold rounded-sm", {
+                        className={clsx("w-full bg-red-600 hover:bg-red-700 transition text-white py-3 font-semibold rounded-sm", {
                             "opacity-50 cursor-progress": isPending,
                         })}
                         disabled={isPending}

@@ -36,3 +36,41 @@ export const getClothesById = async (clothesId: string) => {
         console.log(error);
     }
 }
+
+export const getClothesDetailById = async (clothesId: string) => {
+    try {
+        const clothes = await prisma.clothes.findUnique({
+            where: { id: clothesId },
+            include: {
+                ClothesAmenities: {
+                    include: {
+                        Amenities: {
+                            select: {
+                                name: true,
+                            }
+                        }
+                    }
+                }
+            },
+        });
+        return clothes;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const getCartItems = async (userId: string) => {
+    try {
+        const cartItems = await prisma.cart.findMany({
+            where: { userId },
+            include: {
+                clothes: true,
+            },
+            orderBy: { createdAt: "desc" },
+        });
+        return cartItems || [];
+    } catch (error) {
+        console.log(error);
+        return [];
+    }
+};

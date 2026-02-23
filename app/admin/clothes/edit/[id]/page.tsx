@@ -1,6 +1,18 @@
 import { notFound } from 'next/navigation';
 import EditContent from '@/components/admin/content/edit-clothes';
 import { Suspense } from 'react';
+import { getClothes } from '@/lib/data';
+
+export const dynamic = 'force-dynamic';
+
+export async function generateStaticParams() {
+    const clothes = await getClothes();
+    if (!clothes) return [];
+
+    return clothes.map((item) => ({
+        id: item.id,
+    }));
+}
 
 const UpdateClothesPage = async ({
     params

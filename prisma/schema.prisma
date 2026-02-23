@@ -21,10 +21,11 @@ model Clothes {
   image         String 
   price         Int
   quantity      Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
   ClothesAmenities ClothesAmenities[]
-  Addtocart Addtocart[]
+  carts            Cart[]
 }
 
 model Amenities {
@@ -43,44 +44,46 @@ model ClothesAmenities {
   Amenities Amenities @relation(fields: [amenitiesId], references: [id], onDelete: Cascade)
 }
 
-model Addtocart {
-  id            String @id @default(cuid())
-  startDate DateTime
-  endDate DateTime
-  price         Int
-  userId        String
-  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  clothesId     String 
-  Clothes Clothes @relation(fields: [clothesId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Payment Payment?
+model Cart {
+  id         String   @id @default(cuid())
+  clothesId  String
+  quantity   Int      @default(1)
+  price      Int
+  userId     String
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+  clothes    Clothes  @relation(fields: [clothesId], references: [id])
+  payments   Payment[]
 }
 
+
 model Payment {
-  id            String @id @default(cuid())
-  method        String?
-  amount        Int
-  status        String @default("unpaid")
+  id        String   @id @default(cuid())
+  method    String?
+  amount    Int
+  status    String   @default("unpaid")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  addtocartId   String @unique
-  Addtocart Addtocart @relation(fields: [addtocartId], references: [id], onDelete: Cascade)
+
+  cartId    String   @unique
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id            String          @id @default(cuid())
+  id            String   @id @default(cuid())
   name          String?
-  email         String          @unique
+  email         String   @unique
   emailVerified DateTime?
   image         String?
-  role          String @default("user")
+  role          String   @default("user")
   phone         String?
+
   accounts      Account[]
-  Addtocart     Addtocart[]
- 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  carts         Cart[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
  
 model Account {

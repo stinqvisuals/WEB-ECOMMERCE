@@ -37,7 +37,7 @@ const ClothesTable = async () => {
                         const priceValue = typeof item.price === 'number' ? item.price : Number(item.price) || 0;
 
                         return (
-                            <tr key={item.id} className="hover:bg-gray-900">
+                            <tr key={item.id}>
                                 <td className="px-6 py-4">
                                     <div className="relative h-16 w-16 bg-gray-800 rounded overflow-hidden">
                                         <Image

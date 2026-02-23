@@ -8,15 +8,22 @@ export default function Home() {
   return (
     <div>
       <Hero />
-      <div className="mt-16">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold uppercase">Clothes & Rates</h1>
-          <p className="py-3">
+
+      <section className="mt-16 px-6 sm:px-8 lg:px-12 max-w-7xl mx-auto">
+
+        <div className="text-center mb-12">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold uppercase">
+            Clothes & Rates
+          </h1>
+
+          <p className="mt-4 text-gray-400 max-w-2xl mx-auto">
             Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui, veniam?
           </p>
         </div>
+
         <Main />
-      </div>
+
+      </section>
     </div>
-  )
+  );
 }
