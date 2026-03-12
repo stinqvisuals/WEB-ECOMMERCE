@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const ClothesPage = () => {
     return (
         <div>
-            <HeaderSection title="Clothes & Rates" subTitle="Lorem ipsum dolor sit amet." />
+            <HeaderSection title="Stinq Clothes" subTitle="Lorem ipsum dolor sit amet." />
             <div className="mt-10 px-4">
                 <Suspense fallback={<ClothesSkeleton />}>
                     <Main />

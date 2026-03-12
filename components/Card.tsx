@@ -38,7 +38,6 @@ const Card = ({ clothes }: { clothes: Clothes }) => {
                     <span className="text-lg sm:text-xl font-semibold text-gray-300">
                         {formatCurrency(clothes.price)}
                     </span>
-                    <span className="text-gray-400 text-sm ml-1">/Pieces</span>
                 </div>
 
                 {/* Quantity */}

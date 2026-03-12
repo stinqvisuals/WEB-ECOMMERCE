@@ -4,16 +4,16 @@ import Link from "next/link";
 const Footer = () => {
   return (
     <footer className="bg-black text-white">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-9">
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
 
           {/* Company Info */}
-          <div>
+          <div className="lg:pr-8">
             <Image
               src="/STINQ LOGO CHROME WHITE.png"
-              width={140}
-              height={50}
+              width={100}
+              height={25}
               alt="logo"
               className="mb-6"
             />

@@ -11,11 +11,11 @@ const Navbar = () => {
                 <div className="flex items-center justify-between h-20">
 
                     {/* LEFT */}
-                    <Link href="/">
+                    <Link href="/" className="hover:opacity-70 transition">
                         <Image
                             src="/STINQ LOGO CHROME BLACK.png"
-                            width={120}
-                            height={45}
+                            width={90}
+                            height={15}
                             alt="logo"
                             priority
                         />

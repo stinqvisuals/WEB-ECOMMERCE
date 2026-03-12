@@ -23,14 +23,14 @@ const RightSection = () => {
                 <>
                     <Image
                         src={session.user.image || "/user.svg"}
-                        width={32}
-                        height={32}
+                        width={35}
+                        height={35}
                         alt="avatar"
                         className="hidden lg:block rounded-full border"
                     />
 
                     <button
-                        onClick={() => signOut()}
+                        onClick={() => signOut({ redirectTo: '/' })}
                         className="hidden lg:block bg-red-600 px-4 py-2 rounded text-sm font-bold hover:bg-red-700 transition"
                     >
                         Sign Out

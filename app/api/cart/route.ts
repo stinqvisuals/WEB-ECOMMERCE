@@ -6,7 +6,11 @@ export async function POST(req: Request) {
     try {
         const session = await auth();
 
+        console.log("=== CART API POST ===");
+        console.log("Session:", session);
+
         if (!session?.user?.id) {
+            console.log("Unauthorized - No session or user ID");
             return NextResponse.json(
                 { message: "Unauthorized - Please login first" },
                 { status: 401 }
@@ -14,8 +18,9 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json();
-
         const { clothesId, quantity, price } = body;
+
+        console.log("Cart data received:", { clothesId, quantity, price, userId: session.user.id });
 
         if (!clothesId || !quantity || !price) {
             return NextResponse.json(
@@ -24,25 +29,7 @@ export async function POST(req: Request) {
             );
         }
 
-        // Check if item already exists in cart for this user
-        const existingCartItem = await prisma.cart.findFirst({
-            where: {
-                clothesId,
-                userId: session.user.id,
-            },
-        });
-
-        if (existingCartItem) {
-            // Update quantity instead of creating new item
-            const cart = await prisma.cart.update({
-                where: { id: existingCartItem.id },
-                data: {
-                    quantity: existingCartItem.quantity + quantity,
-                },
-            });
-            return NextResponse.json(cart);
-        }
-
+        console.log("Creating new cart item (always new record for persistence)...");
         const cart = await prisma.cart.create({
             data: {
                 clothesId,
@@ -52,6 +39,7 @@ export async function POST(req: Request) {
             },
         });
 
+        console.log("Cart created successfully:", cart);
         return NextResponse.json(cart);
     } catch (error) {
         console.error("Error adding to cart:", error);

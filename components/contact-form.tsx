@@ -40,7 +40,7 @@ const ContactForm = () => {
                         </div>
                     </div>
                 </div>
-                <button type="submit" className={clsx("px-10 text-center py-4 font-semibold text-white w-full bg-red-600 rounded-sm hover:bg-red-700 cursor-pointer",
+                <button type="submit" className={clsx("px-10 text-center py-4 font-semibold text-white w-full bg-red-600 rounded-sm hover:bg-red-700 transition cursor-pointer",
                     {
                         "opacity-50 cursor-progress animate-pulse": isPending,
                     })}

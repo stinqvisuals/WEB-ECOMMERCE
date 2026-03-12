@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -15,48 +9,45 @@ datasource db {
 }
 
 model Clothes {
-  id            String @id @default(cuid())
-  name          String 
-  description   String @db.Text
-  image         String 
-  price         Int
-  quantity      Int @default(1)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  ClothesAmenities ClothesAmenities[]
+  id               String             @id @default(cuid())
+  name             String
+  description      String
+  image            String
+  price            Int
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  quantity         Int                @default(1)
   carts            Cart[]
+  ClothesAmenities ClothesAmenities[]
 }
 
 model Amenities {
-  id            String @id @default(cuid())
-  name          String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String             @id @default(cuid())
+  name             String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
   ClothesAmenities ClothesAmenities[]
 }
 
 model ClothesAmenities {
-  id            String @id @default(cuid())
-  clothesId     String
-  Clothes Clothes @relation(fields: [clothesId], references: [id], onDelete: Cascade)
-  amenitiesId   String
-  Amenities Amenities @relation(fields: [amenitiesId], references: [id], onDelete: Cascade)
+  id          String    @id @default(cuid())
+  clothesId   String
+  amenitiesId String
+  Amenities   Amenities @relation(fields: [amenitiesId], references: [id], onDelete: Cascade)
+  Clothes     Clothes   @relation(fields: [clothesId], references: [id], onDelete: Cascade)
 }
 
 model Cart {
-  id         String   @id @default(cuid())
-  clothesId  String
-  quantity   Int      @default(1)
-  price      Int
-  userId     String
-  createdAt  DateTime @default(now())
-
-  user       User     @relation(fields: [userId], references: [id])
-  clothes    Clothes  @relation(fields: [clothesId], references: [id])
-  payments   Payment[]
+  id        String   @id @default(cuid())
+  clothesId String
+  price     Int
+  userId    String
+  createdAt DateTime @default(now())
+  quantity  Int      @default(1)
+  clothes   Clothes  @relation(fields: [clothesId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  payments  Payment?
 }
-
 
 model Payment {
   id        String   @id @default(cuid())
@@ -65,27 +56,24 @@ model Payment {
   status    String   @default("unpaid")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   cartId    String   @unique
   cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String   @unique
+  email         String    @unique
   emailVerified DateTime?
   image         String?
-  role          String   @default("user")
+  role          String    @default("user")
   phone         String?
-
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   accounts      Account[]
   carts         Cart[]
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
 }
- 
+
 model Account {
   userId            String
   type              String
@@ -98,18 +86,16 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
- 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
- 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@id([provider, providerAccountId])
 }
 
 model Contact {
-  id        String @id @default(cuid())
-  name      String 
+  id        String   @id @default(cuid())
+  name      String
   email     String
   subject   String
   message   String

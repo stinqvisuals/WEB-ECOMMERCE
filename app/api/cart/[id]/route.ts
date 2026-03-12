@@ -2,6 +2,52 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 
+export async function GET(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        const { id } = await params;
+
+        // Get cart item by ID
+        const cart = await prisma.cart.findUnique({
+            where: { id },
+            include: {
+                clothes: {
+                    select: {
+                        id: true,
+                        name: true,
+                        image: true,
+                        price: true
+                    }
+                },
+                user: {
+                    select: {
+                        name: true,
+                        email: true,
+                        phone: true
+                    }
+                }
+            }
+        });
+
+        if (!cart) {
+            return NextResponse.json(
+                { message: "Cart item not found" },
+                { status: 404 }
+            );
+        }
+
+        return NextResponse.json(cart);
+    } catch (error) {
+        console.error("Error fetching cart:", error);
+        return NextResponse.json(
+            { message: "Failed to fetch cart" },
+            { status: 500 }
+        );
+    }
+}
+
 export async function PATCH(
     req: Request,
     { params }: { params: Promise<{ id: string }> }

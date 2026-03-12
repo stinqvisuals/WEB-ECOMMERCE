@@ -26,7 +26,7 @@ const CartPage = async () => {
             {cartItems.length === 0 ? (
                 <div className="text-center py-20">
                     <p className="text-gray-400 text-lg">Your cart is empty</p>
-                    <a href="/clothes" className="inline-block mt-4 px-6 py-3 bg-red-700 rounded-md font-semibold hover:bg-red-600 transition">
+                    <a href="/clothes" className="inline-block mt-4 px-6 py-3 bg-red-600 rounded-md font-semibold hover:bg-red-700 transition">
                         Browse Clothes
                     </a>
                 </div>

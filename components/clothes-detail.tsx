@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import { IoCheckmark, IoShirtOutline } from "react-icons/io5";
 import { formatCurrency } from "@/lib/utils";
 import CartForm from "@/components/cart-form";
+import BuyNowButton from "@/components/buy-now-button";
 import { auth } from "@/auth";
-import Link from "next/link";
 
 const ClothesDetail = async ({ clothesId }: { clothesId: string }) => {
     const clothes = await getClothesDetailById(clothesId);
@@ -34,15 +34,15 @@ const ClothesDetail = async ({ clothesId }: { clothesId: string }) => {
                 </div>
 
                 {/* RIGHT SIDE - PRODUCT INFO */}
-                <div className="flex flex-col space-y-6">
+                <div className="flex flex-col space-y-5">
 
                     {/* NAME */}
-                    <h1 className="text-2xl font-bold tracking-tight">
+                    <h1 className="text-3xl font-bold tracking-tight">
                         {clothes.name}
                     </h1>
 
                     {/* PRICE */}
-                    <div className="text-1xl font-semibold">
+                    <div className="text-2xl font-semibold">
                         {formatCurrency(clothes.price)}
                         <span className="text-gray-400 text-base ml-2"></span>
                     </div>
@@ -85,10 +85,11 @@ const ClothesDetail = async ({ clothesId }: { clothesId: string }) => {
                             stock={clothes.quantity}
                         />
 
-                        <Link href={`/checkout?clothesId=${clothes.id}`}
-                            className="block w-full text-center border border-white mt-4 py-3 rounded-lg font-semibold hover:bg-white hover:text-black transition">
-                            Buy Now
-                        </Link>
+                        <BuyNowButton
+                            clothesId={clothes.id}
+                            price={clothes.price}
+                            userId={userId}
+                        />
                     </div>
                 </div>
             </div>

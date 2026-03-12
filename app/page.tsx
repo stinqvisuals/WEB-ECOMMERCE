@@ -13,7 +13,7 @@ export default function Home() {
 
         <div className="text-center mb-12">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold uppercase">
-            Clothes & Rates
+            Our Collection
           </h1>
 
           <p className="mt-4 text-gray-400 max-w-2xl mx-auto">

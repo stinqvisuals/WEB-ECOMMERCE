@@ -142,3 +142,58 @@ export const updateClothes = async (prevState: unknown, formData: FormData, imag
     revalidatePath("/admin/clothes");
     redirect("/admin/clothes");
 }
+
+// Server action to create test data for dashboard
+export async function createTestData() {
+    try {
+        // Get first user
+        const user = await prisma.user.findFirst();
+        if (!user) {
+            console.log("No users found");
+            return;
+        }
+
+        // Get first clothes
+        const clothes = await prisma.clothes.findFirst();
+        if (!clothes) {
+            console.log("No clothes found");
+            return;
+        }
+
+        // Create test cart with payment
+        const testCart = await prisma.cart.create({
+            data: {
+                userId: user.id,
+                clothesId: clothes.id,
+                price: 150000,
+                quantity: 2,
+            }
+        });
+
+        // Create payment with status "paid"
+        await prisma.payment.create({
+            data: {
+                cartId: testCart.id,
+                amount: 300000,
+                status: "paid",
+                method: "credit_card"
+            }
+        });
+
+        console.log("Test data created:", testCart);
+        revalidatePath("/admin/dashboard");
+    } catch (error) {
+        console.error("Error creating test data:", error);
+    }
+}
+
+// Server action to delete test data
+export async function deleteTestData() {
+    try {
+        // Log only - DISABLED delete for data persistence
+        console.log("Test data delete called - DISABLED for persistence. All carts safe!");
+        revalidatePath("/admin/dashboard");
+    } catch (error) {
+        console.error("Error in deleteTestData:", error);
+    }
+}

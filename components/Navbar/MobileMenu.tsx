@@ -58,7 +58,7 @@ const MobileMenu = ({ open, setOpen }: MobileMenuProps) => {
                 {session?.user && (
                     <button
                         onClick={() => {
-                            signOut();
+                            signOut({ redirectTo: '/' });
                             setOpen(false);
                         }}
                         className="bg-red-600 px-4 py-2 rounded font-bold mt-4"
