@@ -46,7 +46,7 @@ model Cart {
   quantity  Int      @default(1)
   clothes   Clothes  @relation(fields: [clothesId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
-  payments  Payment?
+  Payment   Payment?
 }
 
 model Payment {
@@ -61,17 +61,13 @@ model Payment {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  role          String    @default("user")
-  phone         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  carts         Cart[]
+  id        String    @id @default(cuid())
+  name      String?
+  email     String    @unique
+  createdAt DateTime  @default(now())
+  Account   Account[]
+  Cart      Cart[]
+  orders    Order[]
 }
 
 model Account {
@@ -93,6 +89,26 @@ model Account {
   @@id([provider, providerAccountId])
 }
 
+model Order {
+  id          String      @id @default(cuid())
+  userId      String
+  totalAmount Int
+  status      OrderStatus @default(PENDING)
+  midtransId  String?
+  createdAt   DateTime    @default(now())
+  user        User        @relation(fields: [userId], references: [id])
+  items       OrderItem[]
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Int
+  order     Order  @relation(fields: [orderId], references: [id])
+}
+
 model Contact {
   id        String   @id @default(cuid())
   name      String
@@ -101,4 +117,10 @@ model Contact {
   message   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
 }

@@ -1,69 +1,37 @@
 import { getDashboardStats } from "@/lib/data";
-import { LuChartArea, LuShoppingCart, LuUsers, LuTrash2 } from "react-icons/lu";
 import { formatCurrency } from "@/lib/utils";
-import { notFound } from "next/navigation";
-import { deleteTestData } from "@/lib/actions";
 
 const DashboardCards = async () => {
   const stats = await getDashboardStats();
 
-  if (!stats) return notFound();
-
-  // Check if there's test data (revenue = 300000 and totalOrders <= 5)
-  const hasTestData = stats.revenue === 300000 && stats.totalOrders > 0;
+  console.log('=== DASHBOARD CARDS ===', stats.revenue, 'from Payment SUM');
 
   return (
-    <div className='grid md:grid-cols-2 lg:grid-cols-3 mt-10 gap-5 pb-10'>
-      {/* Total Revenue */}
-      <div className="flex items-center bg-black rounded-md overflow-hidden shadow-sm">
-        <div className="p-4 bg-green-400">
-          <LuChartArea className="size-12 text-white" />
-        </div>
-        <div className="px-4 text-white">
-          <h3 className="text-sm tracking-wider">Total Revenue</h3>
-          <p className="text-3xl ">{formatCurrency(stats.revenue)}</p>
-        </div>
+    <div className="grid md:grid-cols-3 gap-6 mt-10">
+      <div className="bg-black p-6 rounded-lg shadow border-l-4 border-green-400">
+        <p className="text-white text-sm">Total Revenue</p>
+        <h2 className="text-3xl font-bold text-green-400">
+          {formatCurrency(stats.revenue)}
+        </h2>
+        <p className="text-xs text-gray-400 mt-1">{stats.completedOrders} paid orders</p>
       </div>
 
-      {/* Total Orders */}
-      <div className="flex items-center bg-black rounded-md overflow-hidden shadow-sm">
-        <div className="p-4 bg-purple-500">
-          <LuShoppingCart className="size-12 text-white" />
-        </div>
-        <div className="px-4 text-white">
-          <h3 className="text-sm tracking-wider">Total Orders</h3>
-          <p className="text-3xl ">{stats.totalOrders}</p>
-        </div>
+      <div className="bg-black p-6 rounded-lg shadow border-l-4 border-blue-400">
+        <p className="text-white text-sm">Total Orders</p>
+        <h2 className="text-3xl font-bold text-blue-400">
+          {stats.totalOrders ?? 0}
+        </h2>
       </div>
 
-      {/* Total Customers */}
-      <div className="flex items-center bg-black rounded-md overflow-hidden shadow-sm">
-        <div className="p-4 bg-blue-600">
-          <LuUsers className="size-12 text-white" />
-        </div>
-        <div className="px-4 text-white">
-          <h3 className="text-sm tracking-wider">Total Customers</h3>
-          <p className="text-3xl">{stats.totalCustomers}</p>
-        </div>
+      <div className="bg-black p-6 rounded-lg shadow border-l-4 border-purple-400">
+        <p className="text-white text-sm">Total Customers</p>
+        <h2 className="text-3xl font-bold text-purple-400">
+          {stats.totalCustomers ?? 0}
+        </h2>
       </div>
-
-      {/* Delete Test Data Button - Only show if there's test data */}
-      {hasTestData && (
-        <form action={deleteTestData} className="flex items-center bg-black rounded-md overflow-hidden shadow-sm border border-red-500">
-          <div className="p-4 bg-red-500">
-            <LuTrash2 className="size-12 text-white" />
-          </div>
-          <div className="px-4">
-            <button type="submit" className="text-white text-sm hover:underline">
-              Hapus Data Test
-            </button>
-            <p className="text-gray-400 text-xs">Klik untuk menghapus data test</p>
-          </div>
-        </form>
-      )}
     </div>
-  )
-}
+  );
+};
 
-export default DashboardCards
+export default DashboardCards;
 

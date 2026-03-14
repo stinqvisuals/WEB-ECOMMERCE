@@ -78,12 +78,11 @@ export const getCartById = async (id: string) => {
                         price: true
                     }
                 },
-                payments: true,
+                Payment: true,
                 user: {
                     select: {
                         name: true,
-                        email: true,
-                        phone: true
+                        email: true
                     }
                 },
             },
@@ -110,56 +109,6 @@ export const getCartItems = async (userId: string) => {
     }
 };
 
-export const getRevenueAndClothes = async () => {
-    try {
-        // Get carts with successful payments (paid status)
-        const carts = await prisma.cart.findMany({
-            where: {
-                payments: {
-                    some: {
-                        status: "paid",
-                    },
-                },
-            },
-            include: {
-                payments: {
-                    where: { status: "paid" }
-                },
-            },
-        });
-
-        // Calculate revenue by multiplying price with quantity for each cart item
-        const revenue = carts.reduce((sum, cart) => sum + (cart.price * cart.quantity), 0);
-
-        return {
-            revenue: revenue,
-            clothes: carts.length,
-        };
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-export const getTotalCustomers = async () => {
-    try {
-        // Get unique users with successful payments
-        const result = await prisma.cart.findMany({
-            distinct: ["userId"],
-            where: {
-                payments: {
-                    some: {
-                        status: "paid",
-                    },
-                },
-            },
-            select: { userId: true }
-        });
-        return result;
-    } catch (error) {
-        console.log(error);
-    }
-}
-
 export interface DashboardStats {
     totalOrders: number;
     pendingOrders: number;
@@ -173,22 +122,47 @@ export interface DashboardStats {
 
 export const getDashboardStats = async (): Promise<DashboardStats> => {
     try {
-        const result = await prisma.$queryRaw`
-            SELECT 
-              (SELECT COUNT(*)::int FROM "Cart") as "totalOrders",
-              COALESCE((SELECT COUNT(*)::int FROM "Cart" c WHERE EXISTS (SELECT 1 FROM "Payment" p WHERE p."cartId" = c.id AND p."status" = 'paid')), 0) as "completedOrders",
-              COALESCE((SELECT COUNT(*)::int FROM "Cart" c WHERE EXISTS (SELECT 1 FROM "Payment" p WHERE p."cartId" = c.id AND p."status" = 'pending')), 0) as "pendingOrders",
-              COALESCE((SELECT COUNT(*)::int FROM "Cart" c WHERE NOT EXISTS (SELECT 1 FROM "Payment" p WHERE p."cartId" = c.id)), 0) as "newOrders",
-              COALESCE((SELECT COUNT(*)::int FROM "Cart" c WHERE EXISTS (SELECT 1 FROM "Payment" p WHERE p."cartId" = c.id AND p."status" = 'failure')), 0) as "failedOrders",
-              COALESCE((SELECT SUM("price"::int * "quantity") FROM "Cart"), 0) as "revenue",
-              COALESCE((SELECT COUNT(DISTINCT c."userId")::int FROM "Cart" c WHERE EXISTS (SELECT 1 FROM "Payment" p WHERE p."cartId" = c.id AND p."status" = 'paid')), 0) as "totalCustomers",
-              (SELECT COUNT(DISTINCT "userId")::int FROM "Cart") as "allCustomers"
-        ` as DashboardStats[];
+        console.log('=== EXACT REVENUE DASHBOARD ===');
 
-        return result[0];
+        const revenueResult = await prisma.payment.aggregate({
+            where: { status: "paid" },
+            _sum: { amount: true }
+        });
 
+        const revenue = Number(revenueResult._sum.amount || 0);
+        console.log('Payment SUM = Rp', revenue);
+
+        const totalOrders = await prisma.cart.count();
+        const completedOrders = await prisma.payment.count({ where: { status: "paid" } });
+
+        const paidPayments = await prisma.payment.findMany({
+            where: { status: "paid" },
+            include: {
+                cart: {
+                    select: {
+                        userId: true
+                    }
+                }
+            }
+        });
+
+        const uniqueUserIds = new Set(paidPayments.map(p => p.cart?.userId).filter(id => id != null));
+        const totalCustomers = uniqueUserIds.size;
+
+        console.log('Stats: revenue=', revenue, 'customers=', totalCustomers);
+
+        return {
+            revenue,
+            totalOrders,
+            totalCustomers,
+            completedOrders,
+            pendingOrders: await prisma.payment.count({ where: { status: "pending" } }),
+            newOrders: totalOrders - completedOrders,
+            failedOrders: await prisma.payment.count({ where: { status: "failure" } }),
+            allCustomers: await prisma.user.count()
+        };
     } catch (error) {
-        console.error('Dashboard stats error:', error);
+        console.error('Dashboard error:', error);
         return {
             totalOrders: 0,
             pendingOrders: 0,
@@ -202,41 +176,15 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
     }
 };
 
-export const getUserCart = async (userId: string) => {
+export const getRecentOrders = async (limit: number = 5): Promise<any[]> => {
     try {
-        const cartItems = await prisma.cart.findMany({
-            where: { userId },
-            include: {
-                clothes: {
-                    select: {
-                        id: true,
-                        name: true,
-                        image: true,
-                        price: true
-                    }
-                },
-                payments: true,
-                user: {
-                    select: {
-                        name: true,
-                        email: true,
-                        phone: true
-                    }
-                },
-            },
-            orderBy: { createdAt: "desc" },
-        });
-        return cartItems;
-    } catch (error) {
-        console.log(error);
-    }
-}
+        console.log('Fetching recent orders...');
 
-export const getRecentOrders = async (limit: number = 5) => {
-    try {
-        // Get all cart items
-        const orders = await prisma.cart.findMany({
-            orderBy: { createdAt: "desc" },
+        const recentCarts = await prisma.cart.findMany({
+            orderBy: {
+                createdAt: "desc"
+            },
+            take: limit * 2,
             include: {
                 clothes: {
                     select: {
@@ -246,13 +194,7 @@ export const getRecentOrders = async (limit: number = 5) => {
                         price: true
                     }
                 },
-                payments: {
-                    select: {
-                        id: true,
-                        status: true,
-                        amount: true
-                    }
-                },
+                Payment: true,
                 user: {
                     select: {
                         id: true,
@@ -260,36 +202,75 @@ export const getRecentOrders = async (limit: number = 5) => {
                         email: true
                     }
                 }
-            },
-        });
-
-        // Group cart items by user and time (within a few minutes window = same order)
-        const groupedOrders: Record<string, typeof orders> = {};
-
-        orders.forEach((order) => {
-            const userId = order.userId;
-            // Use userId + createdAt minute as group key
-            // This groups items added within the same minute as one order
-            const timeKey = new Date(order.createdAt).getTime();
-            const groupKey = `${userId}-${Math.floor(timeKey / (1000 * 60))}`;
-
-            if (!groupedOrders[groupKey]) {
-                groupedOrders[groupKey] = [];
             }
-            groupedOrders[groupKey].push(order);
         });
 
-        // Convert grouped orders to array and sort by most recent
-        const result = Object.values(groupedOrders)
-            .sort((a, b) => {
-                const aDate = new Date(a[0].createdAt).getTime();
-                const bDate = new Date(b[0].createdAt).getTime();
-                return bDate - aDate;
-            })
+        console.log('Recent carts count:', recentCarts.length);
+        if (recentCarts.length === 0) return [];
+
+        // Group by user + minute (order detection)
+        const groups: Record<string, typeof recentCarts> = {};
+
+        recentCarts.forEach(cart => {
+            const minuteKey = Math.floor(new Date(cart.createdAt).getTime() / 60000);
+            const key = `${cart.userId}-${minuteKey}`;
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(cart);
+        });
+
+        const recentOrders = Object.values(groups)
+            .sort((a, b) => new Date(b[0].createdAt).getTime() - new Date(a[0].createdAt).getTime())
             .slice(0, limit);
 
-        return result;
+        console.log('Recent orders first:', recentOrders[0]?.length ? recentOrders[0][0].clothes.name : 'empty');
+        return recentOrders;
+    } catch (error) {
+        console.error('Recent orders error:', error);
+        return [];
+    }
+};
+
+// Safe functions without complex relations
+export const getRevenueAndClothes = async () => {
+    try {
+        const paidPayments = await prisma.payment.findMany({
+            where: { status: "paid" }
+        });
+        const revenue = paidPayments.reduce((sum, p) => sum + Number(p.amount), 0);
+        return { revenue, clothes: paidPayments.length };
     } catch (error) {
         console.log(error);
+        return { revenue: 0, clothes: 0 };
+    }
+};
+
+export const getTotalCustomers = async () => {
+    try {
+        const paidPayments = await prisma.payment.findMany({
+            where: { status: "paid" }
+        });
+        return paidPayments.length;
+    } catch (error) {
+        console.log(error);
+        return 0;
+    }
+};
+
+export const getUserCart = async (userId: string) => {
+    try {
+        const cartItems = await prisma.cart.findMany({
+            where: { userId },
+            include: {
+                clothes: { select: { id: true, name: true, image: true, price: true } },
+                Payment: true,
+                user: { select: { name: true, email: true } }
+            },
+            orderBy: { createdAt: "desc" }
+        });
+        return cartItems;
+    } catch (error) {
+        console.log(error);
+        return [];
     }
 }
+
